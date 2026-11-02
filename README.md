@@ -6,6 +6,7 @@
 |---|---|---|
 | 8 | Build Sprint: первый Web3 MVP | [docs/week08.md](docs/week08.md) |
 | 9 | DeFi на Solana (Jupiter, Pyth) | [docs/week09.md](docs/week09.md) |
+| 10 | RPC, API и blockchain data (dashboard) | [docs/week10.md](docs/week10.md) |
 
 ## Структура
 

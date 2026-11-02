@@ -62,3 +62,9 @@ button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .status { margin-top: 16px; font-size: 14px; word-break: break-all; }
 .status a { color: var(--ok); }
 .error { color: #ff6b6b; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+.table td { padding: 6px 4px; border-bottom: 1px solid var(--line); }
+.table a { color: var(--ok); }
+.ok { color: var(--ok); }
