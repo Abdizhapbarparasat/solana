@@ -19,6 +19,7 @@ import {
   tipIx,
   withdrawIx,
 } from "./lib/tipjar";
+import DefiPanel from "./Defi";
 
 type Status = { kind: "info" | "error"; text: string; sig?: string } | null;
 
@@ -141,6 +142,8 @@ function TipJarApp() {
           </div>
         </div>
       )}
+
+      <DefiPanel tipSol={tipSol} onPickSol={setTipSol} />
 
       {status && (
         <div className={`status ${status.kind === "error" ? "error" : ""}`}>

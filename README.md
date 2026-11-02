@@ -5,6 +5,7 @@
 | Неделя | Тема | Отчёт |
 |---|---|---|
 | 8 | Build Sprint: первый Web3 MVP | [docs/week08.md](docs/week08.md) |
+| 9 | DeFi на Solana (Jupiter, Pyth) | [docs/week09.md](docs/week09.md) |
 
 ## Структура
 
