@@ -1,0 +1,23 @@
+[package]
+name = "vuln_vault"
+version = "0.1.0"
+description = "INTENTIONALLY VULNERABLE program for the Week 12 security lab. Never deploy to mainnet."
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "vuln_vault"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = "0.31.1"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

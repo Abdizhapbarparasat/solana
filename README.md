@@ -8,6 +8,7 @@
 | 9 | DeFi на Solana (Jupiter, Pyth) | [docs/week09.md](docs/week09.md) |
 | 10 | RPC, API и blockchain data (dashboard) | [docs/week10.md](docs/week10.md) |
 | 11 | CPI и composable applications | [docs/week11.md](docs/week11.md) |
+| 12 | Security & Exploit Lab | [docs/week12.md](docs/week12.md) |
 
 ## Структура
 

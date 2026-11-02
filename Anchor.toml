@@ -8,8 +8,13 @@ skip-lint = false
 [programs.localnet]
 tip_jar = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
+vuln_vault = "EcDa2ikT8UfSAUabwozsbeqMeTda8zJhXn1f39NrbxuC"
+secure_vault = "3BsJM29doz3hQWhX8HGt41ggDo5qL2S22GR2FMvukyWK"
+
 [programs.devnet]
 tip_jar = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+vuln_vault = "EcDa2ikT8UfSAUabwozsbeqMeTda8zJhXn1f39NrbxuC"
+secure_vault = "3BsJM29doz3hQWhX8HGt41ggDo5qL2S22GR2FMvukyWK"
 
 [registry]
 url = "https://api.apr.dev"
