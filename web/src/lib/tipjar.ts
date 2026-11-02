@@ -103,3 +103,80 @@ export function decodeJar(data: Buffer): JarData {
   const tipCount = data.readBigUInt64LE(offset);
   return { owner, name, totalTips, tipCount };
 }
+
+// ---------------------------------------------------------------------------
+// Week 11: CPI instructions (reward token + memo)
+// ---------------------------------------------------------------------------
+const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+const ATA_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+
+/** Reward mint of a jar. Seeds: ["reward", jar PDA] */
+export function findRewardMintPda(jarOwner: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("reward"), findJarPda(jarOwner).toBuffer()],
+    PROGRAM_ID
+  )[0];
+}
+
+export function findAta(owner: PublicKey, mint: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+    ATA_PROGRAM_ID
+  )[0];
+}
+
+/** Associated Token Account program, "create idempotent" (instruction 1). */
+export function createAtaIdempotentIx(
+  payer: PublicKey,
+  owner: PublicKey,
+  mint: PublicKey
+): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: ATA_PROGRAM_ID,
+    keys: [
+      { pubkey: payer, isSigner: true, isWritable: true },
+      { pubkey: findAta(owner, mint), isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: false, isWritable: false },
+      { pubkey: mint, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from([1]),
+  });
+}
+
+export async function createRewardMintIx(owner: PublicKey): Promise<TransactionInstruction> {
+  return new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: findJarPda(owner), isSigner: false, isWritable: false },
+      { pubkey: findRewardMintPda(owner), isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: true, isWritable: true },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: await discriminator("create_reward_mint"),
+  });
+}
+
+export async function tipWithReceiptIx(
+  tipper: PublicKey,
+  jarOwner: PublicKey,
+  lamports: bigint
+): Promise<TransactionInstruction> {
+  const mint = findRewardMintPda(jarOwner);
+  return new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: findJarPda(jarOwner), isSigner: false, isWritable: true },
+      { pubkey: mint, isSigner: false, isWritable: true },
+      { pubkey: findAta(tipper, mint), isSigner: false, isWritable: true },
+      { pubkey: tipper, isSigner: true, isWritable: true },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: MEMO_PROGRAM_ID, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.concat([await discriminator("tip_with_receipt"), u64(lamports)]),
+  });
+}

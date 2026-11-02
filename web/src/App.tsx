@@ -13,10 +13,14 @@ import {
 import {
   EXPLORER,
   JarData,
+  createAtaIdempotentIx,
   createJarIx,
+  createRewardMintIx,
   decodeJar,
+  findRewardMintPda,
   findJarPda,
   tipIx,
+  tipWithReceiptIx,
   withdrawIx,
 } from "./lib/tipjar";
 import DefiPanel from "./Defi";
@@ -29,6 +33,7 @@ function TipJarApp() {
   const { publicKey, sendTransaction } = useWallet();
 
   const [myJar, setMyJar] = useState<JarData | null>(null);
+  const [hasRewardMint, setHasRewardMint] = useState(false);
   const [jarName, setJarName] = useState("My tip jar");
   const [targetOwner, setTargetOwner] = useState("");
   const [tipSol, setTipSol] = useState("0.01");
@@ -43,6 +48,8 @@ function TipJarApp() {
     }
     const info = await connection.getAccountInfo(findJarPda(publicKey));
     setMyJar(info ? decodeJar(info.data as Buffer) : null);
+    const mintInfo = await connection.getAccountInfo(findRewardMintPda(publicKey));
+    setHasRewardMint(mintInfo !== null);
   }, [connection, publicKey]);
 
   useEffect(() => {
@@ -78,6 +85,21 @@ function TipJarApp() {
       return new Transaction().add(await tipIx(publicKey!, owner, toLamports(tipSol)));
     });
 
+  const onCreateReward = () =>
+    send("Create reward token", async () =>
+      new Transaction().add(await createRewardMintIx(publicKey!))
+    );
+
+  // One transaction, three programs: ATA program, then tip_jar which calls System, Token and Memo.
+  const onTipWithReceipt = () =>
+    send("Tip with receipt", async () => {
+      const owner = new PublicKey(targetOwner.trim());
+      return new Transaction().add(
+        createAtaIdempotentIx(publicKey!, publicKey!, findRewardMintPda(owner)),
+        await tipWithReceiptIx(publicKey!, owner, toLamports(tipSol))
+      );
+    });
+
   const onWithdraw = () =>
     send("Withdraw", async () =>
       new Transaction().add(await withdrawIx(publicKey!, toLamports(withdrawSol)))
@@ -110,6 +132,13 @@ function TipJarApp() {
                   Withdraw SOL
                 </button>
               </div>
+              {!hasRewardMint && (
+                <div className="row" style={{ marginTop: 8 }}>
+                  <button className="primary" disabled={busy} onClick={onCreateReward}>
+                    Create reward token (for tip receipts)
+                  </button>
+                </div>
+              )}
               <p className="muted">
                 Share this address so people can tip you: <code>{publicKey.toBase58()}</code>
               </p>
@@ -140,7 +169,14 @@ function TipJarApp() {
             <button className="primary" disabled={busy || !targetOwner} onClick={onTip}>
               Send tip (SOL)
             </button>
+            <button className="primary" disabled={busy || !targetOwner} onClick={onTipWithReceipt}>
+              Tip + receipt token
+            </button>
           </div>
+          <p className="muted">
+            "Tip + receipt" works if the jar owner created a reward token. One transaction calls the
+            System, Token and Memo programs.
+          </p>
         </div>
       )}
 
