@@ -1,0 +1,21 @@
+{
+  "name": "solana-course-project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "anchor test",
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "chai": "^4.3.4",
+    "mocha": "^10.0.0",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.5.4"
+  }
+}
